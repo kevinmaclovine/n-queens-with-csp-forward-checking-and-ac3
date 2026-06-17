@@ -1,0 +1,126 @@
+class queen:
+    def __init__( self, n):
+        self.value = 0
+        self.have_value = False
+        self.domain = []
+        self.domain_size = n
+        for i in range(n):
+            self.domain.append(i)
+
+def print_queens(queens , n):
+    for i in range(n):
+        if queens[i].have_value:
+            print("#",i , "value:" , queens[i].value , "domian:" , queens[i].domain , "domain_size:" , queens[i].domain_size)   
+        else:
+            print("#" , i ,"value:none " , "domain:" , queens[i].domain, "domain_size:" , queens[i].domain_size )
+        
+
+def is_safe(selected_queen1 , selected_queen2 , value1 , value2):
+    if value1 == value2 :
+        return False
+    value_diff = value1 - value2
+    queen_pos_diff = selected_queen1 - selected_queen2
+    if abs(queen_pos_diff) == abs(value_diff):
+        return False
+    return True
+
+def update_domain(queens ,selected_queen , bv , n ):
+    for i in range(n):
+        if queens[i].have_value == False:
+            j=0
+            while j < queens[i].domain_size:    
+                if not is_safe(selected_queen , i  , bv , queens[i].domain[j]):
+                    queens[i].domain.pop(j)
+                    queens[i].domain_size -= 1
+                else:
+                    j+=1
+    #print_queens(queens , n)            
+    #exit(1)
+    return queens
+    
+
+def lcv(selected_queen , queens , n):
+    tmp = []
+    for i in range(n) :
+        if queens[i].have_value == False and i != selected_queen:
+            tmp.append(i)
+    
+    tmpkv = {}
+    for i in queens[selected_queen].domain:
+        tmpkv[i] = 0
+        for j in tmp :
+            for z in queens[j].domain :        
+                if not is_safe(selected_queen , j , i , z):
+                    tmpkv[i] += 1
+    
+    sorted_dict = dict(sorted(tmpkv.items(), key=lambda item: item[1]))
+    casted = {int(k): v for k, v in sorted_dict.items()}
+    return list(casted.keys()) 
+        
+def health( queens, n):
+    for i in range(n):
+        if queens[i].have_value == False:
+            if not queens[i].domain:
+                return False
+    return True
+
+        
+def select_func(queens , n):
+    max = n+1; 
+    for i in range(n):
+        if max > queens[i].domain_size and queens[i].have_value == False:
+            max = queens[i].domain_size
+            tmp = i
+    return tmp
+
+def complete(a , n):
+    for i in range(n):
+        if a[i].have_value == False:
+            return False
+    return True
+
+def n_queen_csp(queens ,  n):
+    if complete(queens , n):
+        for i in queens:
+            print(i.value)
+        #return True
+        exit(-1)
+        #return queens
+    selected_queen = select_func( queens , n)
+    best_values = lcv(selected_queen , queens , n )
+    for bv in best_values:
+        #print(selected_queen , bv)
+        #print_queens(queens , n)
+        previous_state = queens
+        queens[selected_queen].have_value = True
+        queens[selected_queen].value = bv
+        queens = update_domain(queens ,selected_queen , bv , n)
+        if health(queens , n):    
+        #    if arc3(queens, n):
+            if n_queen_csp(queens , n) == True:
+                return True
+        print("before:")
+        print_queens (queens , n)          
+        queens = previous_state
+        print("after:")
+        print_queens(queens , n)
+
+    #print("shiiiiiiiiit")
+    return False  
+
+    
+        #copy current state
+        #update domain and queens and have_value
+        #if they were constant we go for next if not restore pervious state
+        
+    
+
+def initializing(n):
+    queens = []
+    for i in range(n):
+        queens.append(queen(n))
+    n_queen_csp(queens , n)
+    
+
+
+initializing(4)

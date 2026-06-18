@@ -1,3 +1,6 @@
+import copy
+
+
 class queen:
     def __init__( self, n):
         self.value = 0
@@ -6,6 +9,15 @@ class queen:
         self.domain_size = n
         for i in range(n):
             self.domain.append(i)
+
+def print_output(queens , n ):
+    for i in range(n):
+        for j in range(n):
+            if queens[j].value == i:
+                print("o" , end="")
+            else:
+                print("*" , end="")
+        print("\n" , end="")
 
 def print_queens(queens , n):
     for i in range(n):
@@ -52,7 +64,10 @@ def lcv(selected_queen , queens , n):
             for z in queens[j].domain :        
                 if not is_safe(selected_queen , j , i , z):
                     tmpkv[i] += 1
-    
+    #this is test for consistent
+    #values = tmpkv.values()
+    #if 0 in values:
+    #    return False
     sorted_dict = dict(sorted(tmpkv.items(), key=lambda item: item[1]))
     casted = {int(k): v for k, v in sorted_dict.items()}
     return list(casted.keys()) 
@@ -81,31 +96,28 @@ def complete(a , n):
 
 def n_queen_csp(queens ,  n):
     if complete(queens , n):
-        for i in queens:
-            print(i.value)
-        #return True
-        exit(-1)
+        print_output(queens , n)
+        return True
+        #exit(-1)
         #return queens
     selected_queen = select_func( queens , n)
     best_values = lcv(selected_queen , queens , n )
     for bv in best_values:
-        #print(selected_queen , bv)
-        #print_queens(queens , n)
-        previous_state = queens
+        previous_state = copy.deepcopy(queens)
         queens[selected_queen].have_value = True
         queens[selected_queen].value = bv
         queens = update_domain(queens ,selected_queen , bv , n)
         if health(queens , n):    
         #    if arc3(queens, n):
-            if n_queen_csp(queens , n) == True:
+            resault = n_queen_csp(queens , n)
+            if resault == True:
                 return True
-        print("before:")
-        print_queens (queens , n)          
-        queens = previous_state
-        print("after:")
-        print_queens(queens , n)
+                              
+            queens = previous_state
+        else:
+            queens = previous_state
 
-    #print("shiiiiiiiiit")
+    #print_queens(queens , n)
     return False  
 
     

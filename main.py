@@ -7,6 +7,7 @@ class queen:
         self.have_value = False
         self.domain = []
         self.domain_size = n
+        self.degree = 2
         for i in range(n):
             self.domain.append(i)
 
@@ -15,12 +16,9 @@ def print_output(queens , n ):
         for i in range(n):
             for j in range(n):
                 if queens[j].value == i:
-                    #file.write("o" , end="")
                     file.write("o ")
                 else:
-                    #file.write("*" , end="")
                     file.write("* ")
-            #file.write("\n" , end="")
             file.write("\n")
 
 def print_queens(queens , n):
@@ -50,8 +48,6 @@ def update_domain(queens ,selected_queen , bv , n ):
                     queens[i].domain_size -= 1
                 else:
                     j+=1
-    #print_queens(queens , n)            
-    #exit(1)
     return queens
     
 
@@ -68,10 +64,7 @@ def lcv(selected_queen , queens , n):
             for z in queens[j].domain :        
                 if not is_safe(selected_queen , j , i , z):
                     tmpkv[i] += 1
-    #this is test for consistent
-    #values = tmpkv.values()
-    #if 0 in values:
-    #    return False
+                    
     sorted_dict = dict(sorted(tmpkv.items(), key=lambda item: item[1]))
     casted = {int(k): v for k, v in sorted_dict.items()}
     return list(casted.keys()) 
@@ -83,13 +76,25 @@ def health( queens, n):
                 return False
     return True
 
-        
+def find_max_degree(queens , n):
+    min = -1
+    for i in range(n):
+        if queens[i].degree > min and queens[i].have_value == False:
+            min = queens[i].degree
+    return min           
 def select_func(queens , n):
+    max_degree = find_max_degree(queens , n)
     max = n+1; 
     for i in range(n):
-        if max > queens[i].domain_size and queens[i].have_value == False:
+        if queens[i].degree == max_degree and max > queens[i].domain_size and queens[i].have_value == False:
             max = queens[i].domain_size
             tmp = i
+    try:
+        queens[tmp+1].degree -= 1
+        queens[tmp-1].degree -= 1
+    except:
+        pass
+         
     return tmp
 
 def complete(a , n):
@@ -102,8 +107,7 @@ def n_queen_csp(queens ,  n):
     if complete(queens , n):
         print_output(queens , n)
         return True
-        #exit(-1)
-        #return queens
+    
     selected_queen = select_func( queens , n)
     best_values = lcv(selected_queen , queens , n )
     for bv in best_values:
@@ -121,20 +125,15 @@ def n_queen_csp(queens ,  n):
         else:
             queens = previous_state
 
-    #print_queens(queens , n)
     return False  
-
-    
-        #copy current state
-        #update domain and queens and have_value
-        #if they were constant we go for next if not restore pervious state
         
-    
 
 def initializing(n):
     queens = []
     for i in range(n):
         queens.append(queen(n))
+    queens[0].degree = 1
+    queens[n-1].degree = 1
     n_queen_csp(queens , n)
     
 def input(inputfile):

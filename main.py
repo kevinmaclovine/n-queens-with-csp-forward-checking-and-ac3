@@ -1,5 +1,5 @@
-import copy
-
+from copy import deepcopy
+import sys
 
 class queen:
     def __init__( self, n):
@@ -11,13 +11,17 @@ class queen:
             self.domain.append(i)
 
 def print_output(queens , n ):
-    for i in range(n):
-        for j in range(n):
-            if queens[j].value == i:
-                print("o" , end="")
-            else:
-                print("*" , end="")
-        print("\n" , end="")
+    with open('output.txt', 'w') as file:
+        for i in range(n):
+            for j in range(n):
+                if queens[j].value == i:
+                    #file.write("o" , end="")
+                    file.write("o ")
+                else:
+                    #file.write("*" , end="")
+                    file.write("* ")
+            #file.write("\n" , end="")
+            file.write("\n")
 
 def print_queens(queens , n):
     for i in range(n):
@@ -103,7 +107,7 @@ def n_queen_csp(queens ,  n):
     selected_queen = select_func( queens , n)
     best_values = lcv(selected_queen , queens , n )
     for bv in best_values:
-        previous_state = copy.deepcopy(queens)
+        previous_state = deepcopy(queens)
         queens[selected_queen].have_value = True
         queens[selected_queen].value = bv
         queens = update_domain(queens ,selected_queen , bv , n)
@@ -133,6 +137,12 @@ def initializing(n):
         queens.append(queen(n))
     n_queen_csp(queens , n)
     
+def input(inputfile):
+    with open(inputfile) as f:
+        n = int(f.readline())
+        initializing(n)
 
-
-initializing(4)
+if  len(sys.argv) != 2:
+    print("invalid arguments")
+    exit(-1)
+input(sys.argv[1])

@@ -146,8 +146,6 @@ def arc3(queens , n):
                 if k != i and k != j and queens[k].have_value == False:
                     queue.append((k, i))
 
-    #queens = deepcopy(queens_copy)
-    #print_queens(queens , n)
     return True
         
 
@@ -163,9 +161,7 @@ def n_queen_csp(queens ,  n):
         queens[selected_queen].have_value = True
         queens[selected_queen].value = bv
         queens = update_domain(queens ,selected_queen , bv , n)
-        #print_queens(queens , n)
-        if health(queens , n) and arc3(queens,n):
-            #print_queens(queens , n)    
+        if health(queens , n) and arc3(queens,n): 
             resault = n_queen_csp(queens , n)
             if resault == True:
                 return True

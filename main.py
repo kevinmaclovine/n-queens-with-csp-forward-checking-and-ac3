@@ -103,6 +103,54 @@ def complete(a , n):
             return False
     return True
 
+def revise( i , j , queens):
+    revised = False
+
+    x = 0
+    while x < queens[i].domain_size:
+        supported = False
+
+        for y in queens[j].domain:
+            if is_safe(i, j, queens[i].domain[x] , y):
+                supported = True
+                break
+
+        if not supported:
+            queens[i].domain.pop(x)
+            queens[i].domain_size -= 1
+            revised = True
+            
+        else:
+            x += 1
+
+    return revised
+             
+def arc3(queens , n):
+    queens_copy = deepcopy(queens)
+    queue = []
+    for i in range(n):
+        for j in range(n):
+            if i!=j and queens[i].have_value == False and queens[j].have_value == False:  
+                queue.append((i,j))
+
+                
+    while queue:
+        i, j = queue[0]
+        queue.pop(0)
+        if revise(i, j, queens):
+            if queens[i].domain_size == 0:
+                queens = queens_copy
+                return False
+
+            for k in range(n):
+                if k != i and k != j and queens[k].have_value == False:
+                    queue.append((k, i))
+
+    #queens = deepcopy(queens_copy)
+    #print_queens(queens , n)
+    return True
+        
+
 def n_queen_csp(queens ,  n):
     if complete(queens , n):
         print_output(queens , n)
@@ -115,8 +163,9 @@ def n_queen_csp(queens ,  n):
         queens[selected_queen].have_value = True
         queens[selected_queen].value = bv
         queens = update_domain(queens ,selected_queen , bv , n)
-        if health(queens , n):    
-        #    if arc3(queens, n):
+        #print_queens(queens , n)
+        if health(queens , n) and arc3(queens,n):
+            #print_queens(queens , n)    
             resault = n_queen_csp(queens , n)
             if resault == True:
                 return True
@@ -125,6 +174,7 @@ def n_queen_csp(queens ,  n):
         else:
             queens = previous_state
 
+    print("no slioution found!")
     return False  
         
 
